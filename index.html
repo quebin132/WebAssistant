@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <link rel="stylesheet" href="static\styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="chat-container">
+            <ul class="messages">
+                <li class="chat message" id="chatM1"></li>
+                <li class="chat message" id="chatM2"></li>
+                <li class="chat message" id="chatM3"></li>
+            </ul>
+            <div class="input-container">
+                
+                <form action="" onsubmit="onSubmit(event)">
+                    <input type="text"placeholder="Escribe un mensaje..." id="messageText" />
+                    <button type="submit">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/conexion.js"></script>
+</body>
+</html>
