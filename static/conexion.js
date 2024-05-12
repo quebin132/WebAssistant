@@ -1,4 +1,4 @@
-var socket = new WebSocket("ws://192.168.31.187:12500/ws");
+var socket = new WebSocket("ws://192.168.0.18:12500/ws");
               
             var respuesta,messageHolder;
             
@@ -10,8 +10,12 @@ var socket = new WebSocket("ws://192.168.31.187:12500/ws");
         
             socket.onmessage = function(event) {
                 respuesta = event.data;
-                updateChatmessage(respuesta)
-                
+             
+                let respuestita= document.getElementById("mensajes");
+                let listaresp= document.createElement('li');
+                listaresp.textContent= respuesta
+                respuestita.appendChild(listaresp);
+                listaresp.classList.add("respuestas")
                 // console.log(event)
                 console.log(respuesta);
             };
@@ -29,9 +33,13 @@ var socket = new WebSocket("ws://192.168.31.187:12500/ws");
         
             socket.onerror = function(error) {
                 console.log(`[error] ${error.message}`);
-        };
+            };
 
-var input = document.getElementById("messageText")
+var input = document.getElementById("messageText");
+// const chatinput= document.getElementById("inputchat");
+// chatinput.addEventListener("input",function(event){
+//     onSubmit();
+// });
 // const postOptions = {
 //     method: 'POST',
 //     headers: {
@@ -66,11 +74,13 @@ function onSubmit(event) {
     event.preventDefault();
     socket.send(JSON.stringify(input.value));
     console.log("mensaje enviado");
+    let preguntita= document.getElementById("mensajes");
+    let lista= document.createElement('li');
+    lista.textContent= input.value
+    preguntita.appendChild(lista);
+    lista.classList.add("preguntas")
+    
 
     
 }
 
-function updateChatmessage(resp){
-    messageHolder=document.getElementById("chatM3");
-    messageHolder.textContent = resp;
-}

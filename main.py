@@ -57,32 +57,32 @@ app = FastAPI()
 
 @app.get("/")
 async def home():
-    return FileResponse("index.html")
+    return FileResponse("pruebachat.html")
 
-respuestaChat=""
-@app.post("/respuestas/")
-async def respuestaToPagina(item:Respuesta):
-    print("llego la respuesta")
-    respuestaChat=item
+# respuestaChat=""
+# @app.post("/respuestas/")
+# async def respuestaToPagina(item:Respuesta):
+#     print("llego la respuesta")
+#     respuestaChat=item
 
-    print(item)
-    return item
+#     print(item)
+#     return item
 
-@app.post("/preguntas/")
-async def preguntas_store(item:Pregunta):
-    print("llego pregunta")
-    return item
+# @app.post("/preguntas/")
+# async def preguntas_store(item:Pregunta):
+#     print("llego pregunta")
+#     return item
 
-@app.get("/respuestas/")
-async def respuestaToPagina(item:Respuesta):
-    print("extrayendo pregunta")
-    print(item)
-    return respuestaChat
+# @app.get("/respuestas/")
+# async def respuestaToPagina(item:Respuesta):
+#     print("extrayendo pregunta")
+#     print(item)
+#     return respuestaChat
 
-@app.get("/preguntas/")
-async def preguntas_store(item:Pregunta):
-    print("llego pregunta")
-    return item
+# @app.get("/preguntas/")
+# async def preguntas_store(item:Pregunta):
+#     print("llego pregunta")
+#     return item
    
 
 ws_connections = set()
