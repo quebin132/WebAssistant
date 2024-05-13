@@ -3,44 +3,10 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from langchain_openai import ChatOpenAI
-from langchain_community.vectorstores import FAISS
-from langchain_openai import OpenAIEmbeddings
-from langchain_text_splitters import CharacterTextSplitter
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnableParallel, RunnablePassthrough
 import requests
-##### INTENTAR PONER CHATMODEL ACA
-# se inicializa el modelo
-chat=ChatOpenAI(model="gpt-3.5-turbo-0125")
+from chatModel import modelo
 
 
-
-# Se crean los vectorstores FAISS y los retrievers
-
-embeddings=OpenAIEmbeddings()
-
-vectorstore = FAISS.load_local("vectorstore_assistant_alfa",embeddings,allow_dangerous_deserialization="true")
-
-retriever=vectorstore.as_retriever()
-
-
-
-# Se arma la cadena
-template= """ responde la pregunta basandote en el siguiente contexto:
-{context}
-
-pregunta: {question}
-
-"""
-prompt=ChatPromptTemplate.from_template(template)
-parser=  StrOutputParser()
-setup_retrieval= RunnableParallel(
-    {"context": retriever, "question":RunnablePassthrough()}
-)
-
-chain= setup_retrieval|prompt|chat|parser
 
 ## FASTAPI SERVER
 
@@ -59,30 +25,6 @@ app = FastAPI()
 async def home():
     return FileResponse("pruebachat.html")
 
-# respuestaChat=""
-# @app.post("/respuestas/")
-# async def respuestaToPagina(item:Respuesta):
-#     print("llego la respuesta")
-#     respuestaChat=item
-
-#     print(item)
-#     return item
-
-# @app.post("/preguntas/")
-# async def preguntas_store(item:Pregunta):
-#     print("llego pregunta")
-#     return item
-
-# @app.get("/respuestas/")
-# async def respuestaToPagina(item:Respuesta):
-#     print("extrayendo pregunta")
-#     print(item)
-#     return respuestaChat
-
-# @app.get("/preguntas/")
-# async def preguntas_store(item:Pregunta):
-#     print("llego pregunta")
-#     return item
    
 
 ws_connections = set()
@@ -104,7 +46,7 @@ async def websocket_endpoint(websocket: WebSocket):
             print("Entering loop")
             data = await websocket.receive_text()
             print( data)
-            respuesta=chain.invoke(data)
+            respuesta=modelo.chain.invoke(data)
             await websocket.send_text(respuesta)
             print(respuesta)
 
