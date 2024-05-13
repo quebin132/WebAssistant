@@ -1,4 +1,4 @@
-var socket = new WebSocket("ws://192.168.0.18:12500/ws");
+var socket = new WebSocket("ws://192.168.31.187:12500/ws");
               
             var respuesta,messageHolder;
             
@@ -18,6 +18,7 @@ var socket = new WebSocket("ws://192.168.0.18:12500/ws");
                 listaresp.classList.add("respuestas")
                 // console.log(event)
                 console.log(respuesta);
+                scrollBottom();
             };
             
 
@@ -79,8 +80,11 @@ function onSubmit(event) {
     lista.textContent= input.value
     preguntita.appendChild(lista);
     lista.classList.add("preguntas")
-    
+    scrollBottom();
 
-    
 }
 
+function scrollBottom(){
+    var container = document.getElementById('chatBox');
+    container.scrollTop = container.scrollHeight;
+}

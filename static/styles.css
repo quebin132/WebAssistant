@@ -13,45 +13,40 @@ body, html {
     border: 1px solid #ccc;
     border-radius: 5px;
     overflow: hidden;
+    display: flex; /* Use flexbox */
+    flex-direction: column; /* Arrange items vertically */
+    justify-content: flex-end; /* Move items to the bottom */
 }
 
 .messages {
     list-style-type: none;
-    padding: 0;
-    margin: 0;
+    padding: 5px;
+    margin: 5px;
 }
 
-.message {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-}
 
-.message.sender {
-    background-color: #f0f0f0;
-    text-align: right;
-}
-
-.message.receiver {
-    background-color: #d3d3d3;
-}
 
 .input-container {
     padding: 10px;
     border-top: 1px solid #ccc;
+    align-items: bottom;
 }
 
 .input-container input[type="text"] {
     width: calc(100% - 20px);
     padding: 5px;
-    border: 1px solid #ccc;
+    border: 5px solid #ccc;
     border-radius: 5px;
+    
+
 }
 
 .input-container input[type="submit"] {
-    padding: 5px 10px;
+    padding: 5px 5px;
     border: none;
     background-color: #007bff;
     color: #fff;
     border-radius: 5px;
     cursor: pointer;
+   
 }
