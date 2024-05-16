@@ -1,14 +1,13 @@
 from langchain_openai import ChatOpenAI
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
-from langchain_text_splitters import CharacterTextSplitter
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough
 
 class modelo:
     # se inicializa el modelo
-    chat=ChatOpenAI(model="gpt-3.5-turbo-0125")
+    chat=ChatOpenAI(model="gpt-3.5-turbo-0125",temperature=0)
 
 
 
@@ -23,7 +22,7 @@ class modelo:
 
 
     # Se arma la cadena
-    template= """ responde la pregunta basandote en el siguiente contexto en menos de 40 palabras:
+    template= """ usa el siguiente contexto para responder la pregunta en menos de 40 palabras, si no es posible entonces responde sin basarte en este:
     {context}
 
     pregunta: {question}

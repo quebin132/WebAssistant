@@ -73,15 +73,20 @@ var input = document.getElementById("messageText");
 
 function onSubmit(event) {
     event.preventDefault();
-    socket.send(JSON.stringify(input.value));
-    console.log("mensaje enviado");
-    let preguntita= document.getElementById("mensajes");
-    let lista= document.createElement('li');
-    lista.textContent= input.value
-    preguntita.appendChild(lista);
-    lista.classList.add("preguntas")
-    scrollBottom();
-
+    if (input.value !=""){
+        socket.send(JSON.stringify(input.value));
+        console.log("mensaje enviado");
+        let preguntita= document.getElementById("mensajes");
+        let lista= document.createElement('li');
+        lista.textContent= input.value
+        preguntita.appendChild(lista);
+        lista.classList.add("preguntas")
+        scrollBottom();
+        inputbar = document.getElementById("messageText");
+        console.log(inputbar.value)
+        inputbar.value = "";
+    }
+   
 }
 
 function scrollBottom(){

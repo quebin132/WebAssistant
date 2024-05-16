@@ -3,8 +3,8 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-import requests
 from chatModel import modelo
+import asyncio
 
 
 
@@ -16,6 +16,8 @@ class Respuesta(BaseModel):
 class Pregunta(BaseModel):
     pregunta: str
     
+async def respuesta_LLM(pregunta):
+   await modelo.chain.ainvoke(pregunta)
 
 
 
@@ -23,7 +25,7 @@ app = FastAPI()
 
 @app.get("/")
 async def home():
-    return FileResponse("pruebachat.html")
+    return FileResponse("index.html")
 
    
 
@@ -34,21 +36,22 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.accept()
         print("WebSocket connection accepted")
         ws_connections.add(websocket)
-
-        # Handle the initial message from the client
+       
+            # Handle the initial message from the client
         data = await websocket.receive_text()
         print("Received initial message:", data)
-       
         
+            
 
-        # Enter the loop to continuously receive and send messages
+            # Enter the loop to continuously receive and send messages
         while True:
-            print("Entering loop")
+            print("Entering while loop")
             data = await websocket.receive_text()
             print( data)
-            respuesta=modelo.chain.invoke(data)
+            respuesta= await modelo.chain.ainvoke(data)
             await websocket.send_text(respuesta)
             print(respuesta)
+        
 
     except Exception as e:
         print(f"Error in WebSocket handler: {e}")
