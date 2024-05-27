@@ -5,9 +5,19 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough
 
+# Import necessary modules
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Get environment variables
+openai_key = os.getenv('OPENAI_API_KEY')
+
 class modelo:
     # se inicializa el modelo
-    chat=ChatOpenAI(model="gpt-3.5-turbo-0125",temperature=0)
+    chat=ChatOpenAI(model="gpt-3.5-turbo-0125",temperature=0,api_key=openai_key)
 
 
 
@@ -22,7 +32,7 @@ class modelo:
 
 
     # Se arma la cadena
-    template= """ usa el siguiente contexto para responder la pregunta en menos de 40 palabras, si no es posible entonces responde sin basarte en este:
+    template= """ responde la pregunta basandote en el siguiente contexto en menos de 40 palabras, si no es posible entonces responde de manera normal:
     {context}
 
     pregunta: {question}

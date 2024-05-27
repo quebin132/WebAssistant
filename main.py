@@ -2,20 +2,14 @@ from fastapi import FastAPI,WebSocket
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
 from chatModel import modelo
-import asyncio
+
 
 
 
 ## FASTAPI SERVER
-
-class Respuesta(BaseModel):
-    respuesta : str
     
-class Pregunta(BaseModel):
-    pregunta: str
-    
+    # FUNCION ASINCRONICA PARA RESPONDER PARALELAMENTE A PREGUNTAS DE CLIENTES
 async def respuesta_LLM(pregunta):
    await modelo.chain.ainvoke(pregunta)
 
@@ -28,7 +22,7 @@ async def home():
     return FileResponse("index.html")
 
    
-
+# SE GUARDAN LAS CONEXIONES
 ws_connections = set()
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -46,8 +40,10 @@ async def websocket_endpoint(websocket: WebSocket):
             # Enter the loop to continuously receive and send messages
         while True:
             print("Entering while loop")
+            # SE RECIBE PREGUNTA
             data = await websocket.receive_text()
             print( data)
+            # SE CREA RESPUESTA ASINCRONICA
             respuesta= await modelo.chain.ainvoke(data)
             await websocket.send_text(respuesta)
             print(respuesta)
@@ -60,6 +56,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
 # si no se monta este directorio no carga el javascript ni el css
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
 
 app.add_middleware(
     CORSMiddleware,

@@ -10,15 +10,15 @@ var socket = new WebSocket("ws://192.168.31.187:12500/ws");
         
             socket.onmessage = function(event) {
                 respuesta = event.data;
+                ISRESPONDING= false;
              
-                let respuestita= document.getElementById("mensajes");
-                let listaresp= document.createElement('li');
-                listaresp.textContent= respuesta
-                respuestita.appendChild(listaresp);
-                listaresp.classList.add("respuestas")
+                chatbox.appendChild(createChatLi(respuesta,"respuestas"))
                 // console.log(event)
                 console.log(respuesta);
                 scrollBottom();
+                // speak(respuesta)
+                
+                
             };
             
 
@@ -37,59 +37,57 @@ var socket = new WebSocket("ws://192.168.31.187:12500/ws");
             };
 
 var input = document.getElementById("messageText");
-// const chatinput= document.getElementById("inputchat");
-// chatinput.addEventListener("input",function(event){
-//     onSubmit();
-// });
-// const postOptions = {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json'
-//     },
-//     body: JSON.stringify({"pregunta":input.value}) // Convert the JavaScript object to a JSON string
-//   };
-// // POST A /PREGUNTAS/
-// function sendMessage(event) {
-//     event.preventDefault(); //IMPORTANTE PARA QUE FUNCIONE, HACE QUE NO SE RECARGUE LA PAGINA AL HACE SUBMIT
-//     console.log(typeof(JSON.stringify({"pregunta":input.value})))
-//     console.log(typeof({"pregunta":input.value}))    
-//     console.log(JSON.stringify({"pregunta":input.value}))    
-//     fetch('http://192.168.0.18:12500/preguntas/', postOptions)
-//         .then(response => {
-//         if (!response.ok) {
-//             throw new Error('Network response was not ok');
-//         }
-        
-        
-//         return response.json(); // Parse the JSON response
-//         })
-//         .then(data => {
-//         console.log('Response received:', data);
-//         })
-//         .catch(error => {
-//         console.error('There was a problem with the POST request:', error);
-//         });
-// }
+const chatbox = document.querySelector(".chatbox");
+const chatInput = document.querySelector(".chat-input input");
+var ISRESPONDING= false;
 
+const createChatLi = (message, className) => {
+    // Create a chat <li> element with passed message and className
+    const chatLi = document.createElement("li");
+    chatLi.classList.add("chat", `${className}`);
+    let chatContent = className === "preguntas" ? `<p></p>` : `<span class="material-symbols-outlined">smart_toy</span><p></p>`;
+    chatLi.innerHTML = chatContent;
+    chatLi.querySelector("p").textContent = message;
+    return chatLi; // return chat <li> element
+}
+
+
+// TEXT TO SPEECH
+function speak(text) {
+    // Get the text from the textarea
+
+    // Create an instance of SpeechSynthesisUtterance
+    var utterance = new SpeechSynthesisUtterance(text);
+
+    // Set the language and voice properties
+    utterance.lang = 'es-ES';  // Language and accent
+    utterance.pitch = 1;       // Pitch (default is 1)
+    utterance.rate = 1;        // Rate (default is 1)
+    utterance.volume = 1;      // Volume (default is 1)
+
+    // Use the speechSynthesis API to speak the text
+    window.speechSynthesis.speak(utterance);
+}
 function onSubmit(event) {
     event.preventDefault();
-    if (input.value !=""){
+    if (input.value !="" & !ISRESPONDING){
         socket.send(JSON.stringify(input.value));
+        ISRESPONDING= true;
         console.log("mensaje enviado");
-        let preguntita= document.getElementById("mensajes");
-        let lista= document.createElement('li');
-        lista.textContent= input.value
-        preguntita.appendChild(lista);
-        lista.classList.add("preguntas")
+        userMessage=chatInput.value;
+        
+        chatbox.appendChild(createChatLi(userMessage, "preguntas"));
         scrollBottom();
         inputbar = document.getElementById("messageText");
-        console.log(inputbar.value)
+        console.log(inputbar.value);
         inputbar.value = "";
+        
     }
    
 }
 
 function scrollBottom(){
-    var container = document.getElementById('chatBox');
+    var container = document.getElementById('BOX');
     container.scrollTop = container.scrollHeight;
 }
+
