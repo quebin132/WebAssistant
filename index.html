@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<!-- Coding By CodingNepal - www.codingnepalweb.com -->
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>Chatbot in JavaScript | CodingNepal</title>
+    <title>Asistente Citylab</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
     <link rel="stylesheet" href="static/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google Fonts Link For Icons -->
@@ -13,13 +16,23 @@
   </head>
   <body>
     
-    <div class="chatbot">
+    <div id="dropdownMenu" class="dropdown-menu">
+      <header>
+        <h2> Preguntas frecuentes</h2>
+      </header>
+      <a href="#">Opción 1</a>
+      <a href="#">Opción 2</a>
+      <a href="#">Opción 3</a>
+    </div>
+    <div class="chatbot" id="mainContainer">
       <header>
         <h2>Asistente virtual CityLab Biobio</h2>
-        <span class="close-btn material-symbols-outlined">close</span>
+        <span id="menuIcon" class="material-icons">&vellip;</span>
       </header>
+      
       <ul class="chatbox" id="BOX">
         <li class="chat respuestas">
+          
           <span class="material-symbols-outlined">smart_toy</span>
           <p>¡Hola!, ¿en que puedo ayudarte?</p>
         </li>

@@ -4,7 +4,9 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough
-
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from pypdf import PdfReader
+from fastapi import UploadFile
 # Import necessary modules
 import os
 from dotenv import load_dotenv
@@ -17,7 +19,7 @@ openai_key = os.getenv('OPENAI_API_KEY')
 
 class modelo:
     # se inicializa el modelo
-    chat=ChatOpenAI(model="gpt-3.5-turbo-0125",temperature=0,api_key=openai_key)
+    chat=ChatOpenAI(model="gpt-3.5-turbo-0125",temperature=0.2,api_key=openai_key)
 
 
 
@@ -32,7 +34,7 @@ class modelo:
 
 
     # Se arma la cadena
-    template= """ responde la pregunta basandote en el siguiente contexto en menos de 40 palabras, si no es posible entonces responde de manera normal:
+    template= """ eres un asistente virtual para Citylab, responde las preguntas de la mejor manera posible basandote en el contexto proporcionado en menos de 40 palabras:
     {context}
 
     pregunta: {question}
@@ -45,3 +47,6 @@ class modelo:
     )
 
     chain= setup_retrieval|prompt|chat|parser
+
+
+

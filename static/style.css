@@ -12,36 +12,81 @@ body {
 
 .chatbot {
   position: absolute;
+  height: 80%;
   left: 25%;
-  bottom: 90px;
+  bottom: 10%;
   width: 50%;
   background: #fff;
   border-radius: 15px;
   overflow: hidden;
   opacity: 1;
   margin: 0 auto;
-  
-  
   box-shadow: 0 0 128px 0 rgba(0,0,0,0.1),
               0 32px 64px -48px rgba(0,0,0,0.5);
+  transition: transform 0.5s ease;
   
 }
+.chatbot.move-left {
+  transform: translateX(-30%);
+}
 
-.chatbot header {
+/* Styles for the header */
+header {
   padding: 16px 0;
   position: relative;
-  text-align: center;
+  text-align: center; /* Center the title */
   color: #fff;
   background: #FFCB05;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
-.chatbot header span {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  display: none;
+
+/* Styles for the icon */
+.material-icons {
+  font-family: 'Material Icons';
+  font-size: 24px;
   cursor: pointer;
+  position: absolute;
+  top: 50%;
+  right: 5%; /* Adjust right spacing */
   transform: translateY(-50%);
+}
+/* Estilos para el menú desplegable */
+.dropdown-menu {
+  opacity: 0; /* Ocultar el menú por defecto */
+  position: absolute;
+  width: 23%;
+  height: 80%;
+  bottom: 10%;
+  left: 62%;
+  overflow: hidden;
+  border-radius: 15px;
+  background-color: #fff;
+  
+  
+  transition: opacity 0.5s ease;
+  box-shadow: 0 0 128px 0 rgba(0,0,0,0.1),
+              0 32px 64px -48px rgba(0,0,0,0.5);
+}
+.dropdown-menu.appear {
+  opacity: 1;
+
+}
+
+.dropdown-menu a {
+  display: block;
+  padding: 10px;
+  text-decoration: none;
+  color: #333;
+}
+
+.dropdown-menu a:hover {
+  background-color: #f0f0f0;
+}
+
+.chatbot header span {
+  z-index: 3;
+  padding: 10px;
+  
 }
 header h2 {
   font-size: 1.4rem;
@@ -73,26 +118,31 @@ header h2 {
 .chatbox .respuestas span {
   width: 32px;
   height: 32px;
+  top: 10%;
   color: #fff;
   cursor: default;
   text-align: center;
   line-height: 32px;
+  cursor: pointer;
   align-self: flex-start;
   background: #FFCB05;
+  transition: background-color 0.3s ease;
   border-radius: 4px;
-  margin: 0 10px 7px 0;
+  margin-right: 10px;
+  margin-top: 3px;
 }
+
 .chatbox .chat p {
   white-space: pre-wrap;
   padding: 12px 16px;
-  border-radius: 10px 10px 0 10px;
+  border-radius: 10px 10px 10px 10px;
   max-width: 75%;
   color: #fff;
   font-size: 0.95rem;
   background: #FFCB05;
 }
 .chatbox .respuestas p {
-  border-radius: 10px 10px 10px 0;
+  border-radius: 10px 10px 10px 10px;
 }
 .chatbox .chat p.error {
   color: #721c24;
@@ -120,7 +170,7 @@ header h2 {
 .chat-input input {
   flex: 1;
   height: 55px;
-  width: 100%;
+  width: 90%;
   border: none;
   outline: none;
   resize: none;
@@ -130,20 +180,24 @@ header h2 {
 }
 
 .chat-input span{
-  width: 32px;
-  
-  height: 70%;
+  width: 40px;
+  z-index: 1;
+  height:60%;
   color: #FFCB05;
-  cursor: default;
   text-align: center;
-  line-height: 32px;
-  align-self: flex-end;
+  display: flex; /* Use flexbox */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  /* line-height: 32px; */
+  /* align-self: flex-start; */
+  cursor: pointer;
   
   border-radius: 4px;
-  margin: 0 10px 7px 0;
+  margin: 0 0 0 0;
 }
 
-@media (max-width: 490px) {
+
+@media (max-width: 550px) {
   
   .chatbot {
     left: 0%;
@@ -152,6 +206,7 @@ header h2 {
     height: 100%;
     border-radius: 0;
     width: 100%;
+  
   }
   .chatbot .chatbox {
     height: 90%;
@@ -176,5 +231,47 @@ header h2 {
     border-radius: 4px;
     margin: 0 10px 7px 0;
   }
+  header h2 {
+    font-size: 1.2rem;
+  }
   
+  .chatbot.move-left{
+    overflow-y: hidden;
+    transform: initial;
+  }
+  .material-icons {
+    font-family: 'Material Icons';
+    font-size: 24px;
+    cursor: pointer;
+    position: absolute;
+    top: 46%;
+    right: 5%; /* Adjust right spacing */
+    transform: translateY(-50%);
+  }
+  .dropdown-menu{
+    right: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    
+    position: fixed;
+    z-index: 2;
+    overflow: hidden;
+    border-radius: 0;
+    background-color: #fff;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 128px 0 rgba(0,0,0,0.1),
+                0 32px 64px -48px rgba(0,0,0,0.5);
+  }
+
+  .dropdown-menu.appear{
+    transform: translateX(-62%);
+    width: 100%;
+    height: 60%;
+    
+  }
+  .chatbot header span {
+    right: 2%;
+    
+  }
 }

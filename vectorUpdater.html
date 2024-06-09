@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargar Documento</title>
+</head>
+<body>
+    <h1>Cargar Documento</h1>
+    <div id="passwordContainer">
+        <input type="password" id="passwordInput" placeholder="Ingrese su contraseña">
+        <button onclick="checkPassword()">Ingresar</button>
+    </div>
+    <div id="fileUploadContainer" style="display: none;">
+        <form action="http://192.168.0.3:12500/upload" enctype="multipart/form-data" method="post">
+            <input name="file" type="file">
+            <input type="submit" value="Subir Archivo">
+        </form>
+    </div>
+
+    <script>
+        function checkPassword() {
+            var passwordInput = document.getElementById('passwordInput');
+            var password = passwordInput.value;
+
+            if (password === 'citylab123') {
+                document.getElementById('passwordContainer').style.display = 'none';
+                document.getElementById('fileUploadContainer').style.display = 'block';
+            } else {
+                alert('Contraseña incorrecta. Por favor, inténtalo de nuevo.');
+            }
+        }
+    </script>
+</body>
+</html>

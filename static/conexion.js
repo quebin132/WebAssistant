@@ -1,4 +1,4 @@
-var socket = new WebSocket("ws://192.168.31.187:12500/ws");
+var socket = new WebSocket("ws://192.168.0.18:12500/ws");
               
             var respuesta,messageHolder;
             
@@ -37,6 +37,7 @@ var socket = new WebSocket("ws://192.168.31.187:12500/ws");
             };
 
 var input = document.getElementById("messageText");
+var botonsend= document.getElementById("send-btn");
 const chatbox = document.querySelector(".chatbox");
 const chatInput = document.querySelector(".chat-input input");
 var ISRESPONDING= false;
@@ -78,9 +79,7 @@ function onSubmit(event) {
         
         chatbox.appendChild(createChatLi(userMessage, "preguntas"));
         scrollBottom();
-        inputbar = document.getElementById("messageText");
-        console.log(inputbar.value);
-        inputbar.value = "";
+        input.value = "";
         
     }
    
@@ -91,3 +90,33 @@ function scrollBottom(){
     container.scrollTop = container.scrollHeight;
 }
 
+botonsend.addEventListener("click",onSubmit);
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Obtener el icono del menú y el menú desplegable
+    const menuIcon = document.getElementById('menuIcon');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const container = document.getElementById('mainContainer');
+    let TOGGLING= false;
+    
+  
+    // Agregar un event listener para el clic en el icono del menú
+    menuIcon.addEventListener('click', function() {
+
+      
+      // Alternar la visibilidad del menú desplegable al hacer clic en el icono
+      if (!TOGGLING) {
+        container.classList.toggle('move-left');
+        dropdownMenu.classList.toggle('appear');
+        TOGGLING=true;
+      }
+      setTimeout(() => {
+        TOGGLING=false;
+      }, 500);
+
+    });
+  
+    
+    
+  });
