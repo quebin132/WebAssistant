@@ -3,17 +3,33 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from chatModel import modelo
-from vectorstore_maker import get_pdf_split, text_to_vector,test_vector
+from vectorstore_maker import get_pdf_split, text_to_vector,test_vector,get_text_splits,get_docx_splits,get_ppt_splits
 import aiofiles
 import os
+from uuid import uuid4
+from typing import List
+import logging 
+
+
+httpx_logger = logging.getLogger("httpx")
+httpx_logger.setLevel(logging.WARNING)
+requests_logger = logging.getLogger("requests")
+requests_logger.setLevel(logging.WARNING)
 documento=[]
 
-
+# configuracion logging
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
 ## FASTAPI SERVER
     
     # FUNCION ASINCRONICA PARA RESPONDER PARALELAMENTE A PREGUNTAS DE CLIENTES
-async def respuesta_LLM(pregunta):
-   await modelo.chain.ainvoke(pregunta)
+async def respuesta_LLM(pregunta,connect_id):
+    respuesta= await modelo.final_chain.ainvoke(
+    {"input": pregunta},
+    config={"configurable": {"session_id": connect_id}}
+   )
+    return respuesta['answer']
+
 
 
 
@@ -29,80 +45,133 @@ async def paginaCargaArchivos():
     return FileResponse("vectorUpdater.html")
 
 @app.post("/upload")
-async def extract_text_from_pdf(file: UploadFile = File(...)):
+async def extract_text_from_pdf(files: List[UploadFile] = File(...)):
     # Ensure the uploaded file is a PDF
-    print("entrando a upload")
-    if file.content_type == 'application/pdf':
-       
+    results=[]
+    cantidad= len(files)
+    current=1
+    logger.info("     Empezando procesamiento de archivos")
+    # print("Empezando procesamiento de archivos")
+    for file in files:
+        print(f"{file.filename} : Archivo {current}/{cantidad}")
 
         try:
-            # Read the PDF file contents
-            contents = await file.read()
-            print("se leyo el archivo")
+                logger.info("     Archivo del tipo correcto, iniciando procesamiento ...")
+                # print("Archivo del tipo correcto, iniciando procesamiento ...")
+                # Read the PDF file contents
+                contents = await file.read()
+                
 
-            # Save the PDF file temporarily
-            async with aiofiles.open(file.filename, 'wb') as f:
-                await f.write(contents)
-                print("se guardo el archivo")
+                # Save the PDF file temporarily
+                async with aiofiles.open(file.filename, 'wb') as f:
+                    await f.write(contents)
+                    
+                if file.content_type == 'application/pdf':
 
-            texto_splitted=get_pdf_split(file.filename)
-            print("se spliteo el archivo")
+                    texto_splitted=get_pdf_split(file.filename)
+                    
 
-            # Clean up (remove the temporary file)
-            os.remove(file.filename)
-            print("se elimino el archivo")
-            text_to_vector(texto_splitted,"vectorstore_prueba")
-            print("vector guardado")
-            test_vector("vectorstore_prueba","modelo")
-            print("vector testeado")
+                    # Clean up (remove the temporary file)
+                    os.remove(file.filename)
+                    
+                    text_to_vector(texto_splitted,"vectorstorev2")
+                    
+                    
+                    
+                elif file.content_type == 'text/plain':
+                    texto_splitted=get_text_splits(file.filename)
+                    text_to_vector(texto_splitted,"vectorstorev2")
+                    
+                    os.remove(file.filename)
+                elif file.content_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                    
+                    texto_splitted=get_docx_splits(file.filename)
+                    
+                    text_to_vector(texto_splitted,"vectorstorev2")
+                    
+                    #  test_vector("vectorstorev2","simulacion")
+                    os.remove(file.filename)
+
+                elif file.content_type == 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+                    
+                    texto_splitted= get_ppt_splits(file.filename)
+                    text_to_vector(texto_splitted,"vectorstorev2")
+                    os.remove(file.filename)
+                else:
+                    logger.warning("      Este tipo de archivo no es compatible por el momento")
+                    # print("Este tipo de archivo no es compatible por el momento")
+
+                logger.info("   Archivo añadido al vectorstore")
+                # print("Archivo añadido al vectorstore")
+                current+=1
+
+
+            
+                results.append({'filename': file.filename, 'text': texto_splitted})
 
 
 
-            return {'message': f'Successfully uploaded {file.filename}', 'text': texto_splitted}
+                
 
         except Exception as e:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f'There was an error processing the file: {str(e)}'
-            )
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f'There was an error processing the file: {str(e)}'
+                )
 
         finally:
-            await file.close()
+                await file.close()
+                
+    return {'message': 'Files processed successfully', 'results': results}
     
 @app.get("/upload")
 async def show_files():
     return documento
-# SE GUARDAN LAS CONEXIONES
-ws_connections = set()
+
+# SE GUARDAN LAS CONEXIONES en un diccionario
+ws_connections = {}
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
+    # se crea un codigo unico por usuario, el cual es usado guardar el historial de chat 
+    connection_id= str(uuid4())
     try:
         await websocket.accept()
-        print("WebSocket connection accepted")
-        ws_connections.add(websocket)
+        logger.info("     WebSocket connection accepted")
+        # print("WebSocket connection accepted")
+        ws_connections[connection_id] = websocket
+        logger.info("     Connection ID: %s",connection_id)
+        # print(f"Connection ID: {connection_id}")
+        # print(ws_connections)
        
             # Handle the initial message from the client
         data = await websocket.receive_text()
-        print("Received initial message:", data)
+        # print("Received initial message:", data)
         
             
 
             # Enter the loop to continuously receive and send messages
         while True:
-            print("Entering while loop")
+            # print("Entering while loop")
             # SE RECIBE PREGUNTA
             data = await websocket.receive_text()
-            print( data)
+            
             # SE CREA RESPUESTA ASINCRONICA
-            respuesta= await modelo.chain.ainvoke(data)
+            
+            
+            respuesta= await respuesta_LLM(data,connection_id)
+            
+            
             await websocket.send_text(respuesta)
-            print(respuesta)
+            logger.info("   %s",respuesta)
+            # print(respuesta)
         
 
     except Exception as e:
-        print(f"Error in WebSocket handler: {e}")
-        # Optionally, remove the WebSocket connection from the set
-        ws_connections.remove(websocket)
+        logger.error("  Error in Websocket handler: %s",e)
+        # print(f"Error in WebSocket handler: {e}")
+        # se elimina
+        if connection_id in ws_connections:
+            del ws_connections[connection_id]
 
 # si no se monta este directorio no carga el javascript ni el css
 app.mount("/static", StaticFiles(directory="static"), name="static")

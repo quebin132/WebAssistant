@@ -4,20 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cargar Documento</title>
+    <link rel="stylesheet" href="static/vector_updater_style.css">
+
 </head>
 <body>
-    <h1>Cargar Documento</h1>
-    <div id="passwordContainer">
-        <input type="password" id="passwordInput" placeholder="Ingrese su contraseña">
-        <button onclick="checkPassword()">Ingresar</button>
-    </div>
-    <div id="fileUploadContainer" style="display: none;">
-        <form action="http://192.168.0.3:12500/upload" enctype="multipart/form-data" method="post">
-            <input name="file" type="file">
-            <input type="submit" value="Subir Archivo">
-        </form>
-    </div>
+    
+    <div class="container">
+        <h1>Cargar documento al vectorstore</h1>
+        <div id="passwordContainer" class="passwordContainer">
+            <input type="password" id="passwordInput" placeholder="Ingrese su contraseña">
+            <button onclick="checkPassword()">Ingresar</button>
+        </div>
+        <div id="fileUploadContainer" class="fileUploadContainer" style="display: none;">
+            <form action="http://192.168.31.187:12500/upload" enctype="multipart/form-data" method="post">
+                <input name="files" type="file" multiple>
+                <input type="submit" value="Subir Archivo">
+            </form>
+        </div>
+    
 
+    </div>
+   
     <script>
         function checkPassword() {
             var passwordInput = document.getElementById('passwordInput');

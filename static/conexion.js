@@ -1,4 +1,4 @@
-var socket = new WebSocket("ws://192.168.0.18:12500/ws");
+var socket = new WebSocket("ws://127.0.0.1:12500/ws");
               
             var respuesta,messageHolder;
             

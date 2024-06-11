@@ -1,24 +1,28 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from pypdf import PdfReader
+from langchain.document_loaders.word_document import Docx2txtLoader
+from langchain.document_loaders.csv_loader import CSVLoader
+from langchain_community.document_loaders import UnstructuredPowerPointLoader
 import fitz
 import os
-def get_pdf_split(path):
-  print("entrando a funcion")
-  textSplit = RecursiveCharacterTextSplitter(chunk_size=150,
+
+textSplit = RecursiveCharacterTextSplitter(chunk_size=150,
                                              chunk_overlap=15,
                                              length_function=len)
+def get_pdf_split(path):
+  
+  
   document = fitz.open(path)
-  print("archivo abierto dentro de funcion")
+  
   text = ""
   for page_num in range(len(document)):
             page = document.load_page(page_num)
             text += page.get_text()
-  print("extraccion de texto completada")
+  
   document.close()  # Ensure the document is closed
   #Pages will be list of pages, so need to modify the loop
   
   textoSpliteado = textSplit.split_text(text)
-  print("texto spliteado")
+  
   
   return textoSpliteado
 
@@ -28,9 +32,7 @@ def get_text_splits(text_file):
   with open(text_file,'r') as txt:
     data = txt.read()
 
-  textSplit = RecursiveCharacterTextSplitter(chunk_size=150,
-                                             chunk_overlap=15,
-                                             length_function=len)
+  
   doc_list = textSplit.split_text(data)
   return doc_list
 
@@ -51,9 +53,37 @@ def text_to_vector(doc_list,vector_path):
 
 def test_vector(vector_path,query):
     vector=FAISS.load_local(vector_path,OpenAIEmbeddings(),allow_dangerous_deserialization="true")
-    vector.similarity_search(query)
+    print(vector.similarity_search(query))
 # Se crean los vectorstores FAISS y los retrievers
 
-
+def get_csv_splits(csv_file):
+  """Function takes in the csv and returns the  
+  splits so for further processing can be done."""
+  csvLoader = CSVLoader(csv_file)
+  csvdocs = csvLoader.load()
+  return csvdocs
 # vectorstore = FAISS.load_local("vectorstore_assistant_alfa")
 # vectorstore.save_local("vectorstore_assistant_alfa")
+
+def get_docx_splits(docx_path):
+   doc= Docx2txtLoader(docx_path).load()[0].page_content
+   
+   
+                                           
+   doc_list= textSplit.split_text(doc)
+   
+   return doc_list
+
+def get_ppt_splits(ppt_path):
+   
+   loader= UnstructuredPowerPointLoader(
+        ppt_path, mode="single", strategy="fast",
+    )
+   ppt= loader.load()
+   ppt_ext=ppt[0].page_content
+   doc_list= textSplit.split_text(ppt_ext)
+
+   
+   return doc_list
+   
+
