@@ -1,6 +1,6 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain.document_loaders.word_document import Docx2txtLoader
-from langchain.document_loaders.csv_loader import CSVLoader
+from langchain_community.document_loaders import Docx2txtLoader
+from langchain_community.document_loaders import CSVLoader
 from langchain_community.document_loaders import UnstructuredPowerPointLoader
 import fitz
 import os

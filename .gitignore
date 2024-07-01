@@ -11,3 +11,9 @@ static/favicon-32x32.png
 static/favicon.ico
 static/site.webmanifest
 vectorstore_prueba
+*.wav
+functionCallingTest.ipynb
+local.ipynb
+test.ipynb
+voztotext.html
+voice-to-text.ipynb

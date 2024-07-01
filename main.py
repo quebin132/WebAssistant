@@ -1,5 +1,5 @@
 from fastapi import FastAPI,WebSocket, UploadFile, File, HTTPException, status
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from chatModel import modelo
@@ -9,7 +9,12 @@ import os
 from uuid import uuid4
 from typing import List
 import logging 
+from chatModelv2 import modelov2
 
+from voice_to_text import voice2text
+
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 httpx_logger = logging.getLogger("httpx")
 httpx_logger.setLevel(logging.WARNING)
@@ -18,8 +23,7 @@ requests_logger.setLevel(logging.WARNING)
 documento=[]
 
 # configuracion logging
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
+
 ## FASTAPI SERVER
     
     # FUNCION ASINCRONICA PARA RESPONDER PARALELAMENTE A PREGUNTAS DE CLIENTES
@@ -30,11 +34,57 @@ async def respuesta_LLM(pregunta,connect_id):
    )
     return respuesta['answer']
 
+model= modelov2()
+async def command_LLM(command):
+     async for event in model.graph.astream({"messages": [("user", command)]}, 
+                                                
+                                               stream_mode="values"):
+            
+                print("Assistant:", event["messages"][-1].content)
+
+v2t= voice2text()
+def transcribe(filename):
+    print("entrando a funcion")
+   
+    try:
+# Usar el reconocedor de Google para transcribir el audio
+        text = v2t.transcribe_audio_file(filename)
+     
+    except Exception as e:
+        print(e)
+    
+    
+    finally:
+        os.remove(filename)
+        return text
 
 
 
 app = FastAPI()
+@app.post("/command/")
+async def voice2text(file: UploadFile = File(...)):
+    if not file:
+        raise HTTPException(status_code=400, detail="File not provided")
 
+    try:
+        filename = file.filename
+        file_path = filename
+        print("empezando carga de archivo")
+        with open(file_path, "wb") as buffer:
+            buffer.write(file.file.read())
+        print("archivo cargado")
+        return JSONResponse(status_code=200, content={"message": "File uploaded successfully!"})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+    finally:
+        transcription= transcribe(file_path)
+        print(transcription)
+        await command_LLM(transcription)
+
+
+@app.get("/admin")
+async def adminWindow():
+    return FileResponse("indexAdmin.html")
 
 @app.get("/")
 async def home():
@@ -154,7 +204,7 @@ async def websocket_endpoint(websocket: WebSocket):
             # print("Entering while loop")
             # SE RECIBE PREGUNTA
             data = await websocket.receive_text()
-            
+            logger.info("    %s",data)
             # SE CREA RESPUESTA ASINCRONICA
             
             

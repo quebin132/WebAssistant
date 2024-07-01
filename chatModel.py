@@ -12,7 +12,7 @@ from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_community.chat_message_histories import ChatMessageHistory
 # Import necessary modules
 import os
-from dotenv import load_dotenv
+from dotenv import dotenv_values
 
 store={}
 
@@ -23,10 +23,10 @@ def get_session_history(session_id: str) -> BaseChatMessageHistory:
         return store[session_id]
 
 # Load environment variables from .env file
-load_dotenv()
+env_values = dotenv_values('.env')
 
 # Get environment variables
-openai_key = os.getenv('OPENAI_API_KEY')
+openai_key = env_values['OPENAI_API_KEY']
 
 class modelo:
 
@@ -38,7 +38,7 @@ class modelo:
 
     # Se crean los vectorstores FAISS y los retrievers
 
-    embeddings=OpenAIEmbeddings()
+    embeddings=OpenAIEmbeddings(api_key=openai_key)
 
     vectorstore = FAISS.load_local("vectorstorev2",embeddings,allow_dangerous_deserialization="true")
 
@@ -99,5 +99,7 @@ class modelo:
     # )
 
     # chain= setup_retrieval|prompt|chat|parser
+
+
 
 
