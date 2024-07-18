@@ -1,5 +1,5 @@
-var socket = new WebSocket("ws://127.0.0.1:12500/ws");
-              
+var socket = new WebSocket("ws://192.168.31.239:12500/ws"); 
+              // cambiar IP a la del pc grande
             var respuesta,messageHolder;
             
 

@@ -14,12 +14,12 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,1,0" />
     <script src="static/conexion.js" defer></script>
     <style>
-      /* .dropdown-menu{
+      .dropdown-menu{
         display: none;
       }
       .chatbot{
         display: none;
-      } */
+      }
        .button-container{
         bottom: 10%;
         
@@ -74,14 +74,14 @@
        
       </div>
     </div>
-    <!-- <div>
+    <div>
       <form action="" onsubmit="checkPass(event)" id="formita">
         <input type="password" id="pass" placeholder="Ingrese la contraseña">
         <button type="submit"> Ingresar </button>
       </form>
       
 
-    </div> -->
+    </div>
 
     <script>
 
@@ -132,7 +132,7 @@
         }
       async function startRecording() {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            console.log('local')
+            
             mediaRecorder = new MediaRecorder(stream);
             mediaRecorder.ondataavailable = e => chunks.push(e.data);
             mediaRecorder.onstop = saveAudio;

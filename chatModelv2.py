@@ -29,7 +29,7 @@ class fetchMapInput(BaseModel):
     mapa : str = Field(description="Tipo de mapa que se quiere pedir")
 
 class InputPlacas(BaseModel):
-    placa : str = Field(description="Placa que se quiere cambiar")
+    placa : str = Field(description="Placa que se quiere cambiar, debe ser un numero")
 
 class FetchMapTool(BaseTool):
     name = "Mapas"
@@ -93,23 +93,28 @@ class CambiarPlaca(BaseTool):
         self, placa: str, run_manager: Optional[CallbackManagerForToolRun] = None
     ) -> str:
         url_get= "http://192.168.31.120:8500/api/set_map_state/"
-        if fuzz.ratio(placa,"estado default")> 50:
-            default_state=[13,14,15,16,17,18,19]
-            new_state = ",".join(map(str, default_state))
-           
-            
-        else:   
+        try:
+            placa_int = int(placa)
+        finally:
+            if fuzz.ratio(placa,"estado default")> 50:
+                default_state=[13,14,15,16,17,18,19]
+                new_state = ",".join(map(str, default_state))
+            elif placa_int not in [1,2,3,4,5,6,7]:
+                return "Lo siento, repita el comando por favor"
 
-            placa_n= int(placa) + 12
-            
-            for n in range(len(self.state)):
-                if (self.state[n]==placa_n or self.state[n]==(placa_n+7)):
-                    if(self.state[n] >=20):
-                        self.state[n] -=7
-                    else:
-                        self.state[n] +=7
-            new_state = ",".join(map(str, self.state))
-        url_get += "?slots=" + new_state
+                
+            else:   
+
+                placa_n= placa_int + 12
+                
+                for n in range(len(self.state)):
+                    if (self.state[n]==placa_n or self.state[n]==(placa_n+7)):
+                        if(self.state[n] >=20):
+                            self.state[n] -=7
+                        else:
+                            self.state[n] +=7
+                new_state = ",".join(map(str, self.state))
+            url_get += "?slots=" + new_state
         try:
             requests.get(url=url_get)
             print(new_state)
@@ -166,13 +171,13 @@ class modelov2:
     # memory = AsyncSqliteSaver.from_conn_string(":memory:")
     
 
-user_input = "User: quiero ver el mapa de educacion"
-config = {"configurable": {"thread_id": "1"}}
-from langchain_core.messages import HumanMessage
+# user_input = "User: quiero ver el mapa de educacion"
+# config = {"configurable": {"thread_id": "1"}}
+# from langchain_core.messages import HumanMessage
 
-config = {"configurable": {"thread_id": "1"}}
+# config = {"configurable": {"thread_id": "1"}}
 
-model= modelov2()
+# model= modelov2()
 
 # async def main():
 #     while True:

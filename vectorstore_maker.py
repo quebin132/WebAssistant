@@ -2,7 +2,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import Docx2txtLoader
 from langchain_community.document_loaders import CSVLoader
 from langchain_community.document_loaders import UnstructuredPowerPointLoader
-import fitz
+import pymupdf
 import os
 
 textSplit = RecursiveCharacterTextSplitter(chunk_size=150,
@@ -11,7 +11,7 @@ textSplit = RecursiveCharacterTextSplitter(chunk_size=150,
 def get_pdf_split(path):
   
   
-  document = fitz.open(path)
+  document = pymupdf.open(path)
   
   text = ""
   for page_num in range(len(document)):
