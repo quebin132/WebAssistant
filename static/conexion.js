@@ -5,7 +5,7 @@ var socket = new WebSocket("ws://192.168.31.239:12500/ws");
 
             socket.onopen = function(e) {
                 console.log("[open] Conexión establecida");
-                socket.send(JSON.stringify("conexion desde javascript"));
+                
             };
         
             socket.onmessage = function(event) {
@@ -92,6 +92,31 @@ function scrollBottom(){
 
 botonsend.addEventListener("click",onSubmit);
 
+document.addEventListener("DOMContentLoaded", function() {
+    const questions = document.querySelectorAll(".faq-question");
+
+    questions.forEach(question => {
+        question.addEventListener("click", function(event) {
+            event.preventDefault();
+            const answer = this.nextElementSibling;
+           
+
+            if (answer.style.display === "block") {
+                answer.style.display = "none";
+                answer.classList.remove = "appear";
+                this.classList.remove("active");
+            } else {
+                // Hide all other answers
+                
+                // Show the clicked answer
+                answer.style.display="block";
+                answer.classList.add("appear");
+                
+                this.classList.add("active");
+            }
+        });
+    });
+});
 
 document.addEventListener('DOMContentLoaded', function() {
     // Obtener el icono del menú y el menú desplegable

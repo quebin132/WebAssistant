@@ -36,11 +36,12 @@ async def respuesta_LLM(pregunta,connect_id):
 
 model= modelov2()
 async def command_LLM(command):
-     async for event in model.graph.astream({"messages": [("user", command)]}, 
-                                                
-                                               stream_mode="values"):
-            
-                print("Assistant:", event["messages"][-1].content)
+    res= await model.graph.ainvoke({"messages": [("user", command)]}, stream_mode="values")
+    try:
+        mensaje = res['messages'][3].content     
+    except Exception as e:
+        mensaje=  res['messages'][1].content  
+    return mensaje
 
 v2t= voice2text()
 def transcribe(filename):
@@ -194,7 +195,7 @@ async def websocket_endpoint(websocket: WebSocket):
         # print(ws_connections)
        
             # Handle the initial message from the client
-        data = await websocket.receive_text()
+        
         # print("Received initial message:", data)
         
             
@@ -205,6 +206,7 @@ async def websocket_endpoint(websocket: WebSocket):
             # SE RECIBE PREGUNTA
             data = await websocket.receive_text()
             logger.info("    %s",data)
+            
             # SE CREA RESPUESTA ASINCRONICA
             
             
@@ -222,7 +224,42 @@ async def websocket_endpoint(websocket: WebSocket):
         # se elimina
         if connection_id in ws_connections:
             del ws_connections[connection_id]
+@app.websocket("/wsadmin")
+async def websocket_admin(websocket: WebSocket):
+    try:
+        await websocket.accept()
+        logger.info("     WebSocket connection accepted to admin")
+        # print("WebSocket connection accepted")
+        # print(f"Connection ID: {connection_id}")
+        # print(ws_connections)
+       
+            # Handle the initial message from the client
+        # data = await websocket.receive_text()
+        # print("Received initial message:", data)
+        
+            
 
+            # Enter the loop to continuously receive and send messages
+        while True:
+            # print("Entering while loop")
+            # SE RECIBE PREGUNTA
+            data = await websocket.receive_text()
+            logger.info("    %s",data)
+            
+            # SE CREA RESPUESTA ASINCRONICA
+            
+            
+            respuesta= await command_LLM(data)
+            
+            
+            await websocket.send_text(respuesta)
+            logger.info("   %s",respuesta)
+    except Exception as e:
+        logger.error("  Error in Websocket handler: %s",e)
+        # print(f"Error in WebSocket handler: {e}")
+        # se elimina
+        
+     
 # si no se monta este directorio no carga el javascript ni el css
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
