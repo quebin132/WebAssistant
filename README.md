@@ -50,10 +50,10 @@ Tanto **indexAdmin.html** como **vectorUpdater.html** necesitan una contraseña 
 > [!IMPORTANT]
 > El nombre de las herramientas no puede tener espacios. Deben seguir este regex: '^[a-zA-Z0-9_-]+$'."
 
-El modelo con herramientas usa la libreria langgraph para sy creacion, actualmente no cuenta con memoria porque se penso usar solo para interactuar con el Cityscope, si se quisiera añadir memoria seguir el siguiente tutorial: [Memoria](https://langchain-ai.github.io/langgraph/tutorials/introduction/#part-3-adding-memory-to-the-chatbot).
+El modelo con herramientas usa la libreria langgraph para sy creacion, actualmente no cuenta con memoria porque se penso usar solo para interactuar con el Cityscope, si se quisiera añadir memoria seguir el siguiente tutorial: [Chatbot con memoria](https://langchain-ai.github.io/langgraph/tutorials/introduction/#part-3-adding-memory-to-the-chatbot).
 
 Si se quieren agregar herramientas tienen que seguir la misma forma de las que ya estan en **chatModelv2.py**:
 
-Se debe crear una clase que representa los argumentos que recibira la herramienta y despues usar esta clase en el args_schema de la herramienta, siguiendo esta estructura: [tooling](https://python.langchain.com/v0.1/docs/modules/tools/custom_tools/) en el apartado Subclass BaseTool.
+Se debe crear una clase que representa los argumentos que recibira la herramienta y despues usar esta clase en el args_schema de la herramienta, siguiendo esta estructura: [Custom Tools](https://python.langchain.com/v0.1/docs/modules/tools/custom_tools/) en el apartado Subclass BaseTool.
 
 Una vez se haya creado una nueva herramientase debe crear una instancia de la clase en el _**init**_ de la clase _modelov2_ de la misma forma que ya esta hecho para las herramientas existentes y despues se deben añadir a la lista de herramientas que esta mas abajo. De este modo el modelo deberia tener acceso a las nuevas herramientas.
