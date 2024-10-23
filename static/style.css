@@ -217,6 +217,7 @@ header h2 {
   width: 40px;
   z-index: 1;
   height:60%;
+  cursor: pointer;
   color: #FFCB05;
   text-align: center;
   display: flex; /* Use flexbox */

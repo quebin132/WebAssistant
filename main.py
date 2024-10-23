@@ -10,7 +10,7 @@ from uuid import uuid4
 from typing import List
 import logging 
 from chatModelv2 import modelov2
-
+import asyncio
 from voice_to_text import voice2text
 
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
@@ -26,25 +26,38 @@ documento=[]
 
 ## FASTAPI SERVER
     
-    # FUNCION ASINCRONICA PARA RESPONDER PARALELAMENTE A PREGUNTAS DE CLIENTES
-async def respuesta_LLM(pregunta,connect_id):
-    respuesta= await modelo.final_chain.ainvoke(
-    {"input": pregunta},
-    config={"configurable": {"session_id": connect_id}}
-   )
-    return respuesta['answer']
+    # FUNCION ASINCRONICA PARA RESPONDER PARALELAMENTE A PREGUNTAS DE CLIENTES, SI PASAN 4 SEGUNDOS Y NO HAY RESPUESTA SE MANDA UNA ERROR AL CLIENTE
+async def respuesta_LLM(pregunta:str,connect_id):
+   try:
+        respuesta = await asyncio.wait_for(
+            modelo.final_chain.ainvoke(
+                {"input": pregunta},
+                config={"configurable": {"session_id": connect_id}}
+            ),
+            timeout=4  # timeout in seconds
+        )
+        return respuesta['answer']
+   except asyncio.TimeoutError:
+        return "Ocurrio un error mientras se generaba la respuesta. Por favor intentelo denuevo."
 
 model= modelov2()
-async def command_LLM(command):
-    res= await model.graph.ainvoke({"messages": [("user", command)]}, stream_mode="values")
+# CUMPLE LA MISMA FUNCION QUE RESPUESTA_LLM PERO LAS PREGUNTAS VAN AL MODELO CON HERRAMIENTAS
+async def command_LLM(command:str):
     try:
+        print(command,type(command))
+        res= await asyncio.wait_for(
+            model.graph.ainvoke({"messages": [("user", command)]}, stream_mode="values"), 
+                                    timeout=4)
+        
+        
         mensaje = res['messages'][3].content     
     except Exception as e:
         mensaje=  res['messages'][1].content  
     return mensaje
 
 v2t= voice2text()
-def transcribe(filename):
+# ESTA FUNCION TRANSCRIBE EL .WAV A TEXTO
+def transcribe(filename:str):
     print("entrando a funcion")
    
     try:
@@ -53,6 +66,7 @@ def transcribe(filename):
      
     except Exception as e:
         print(e)
+        logger.warning("   %s",e)
     
     
     finally:
@@ -62,6 +76,7 @@ def transcribe(filename):
 
 
 app = FastAPI()
+# AQUI LLEGAN LOS COMANDOS POR VOZ, SE CONVIERTEN A UN .WAV, SE TRANSCRIBEN Y SE LLAMA A COMMAND_LLM
 @app.post("/command/")
 async def voice2text(file: UploadFile = File(...)):
     if not file:
@@ -95,6 +110,7 @@ async def home():
 async def paginaCargaArchivos():
     return FileResponse("vectorUpdater.html")
 
+# AQUI LLEGAN LOS ARCHIVOS QUE SE QUIEREN AGREGAR AL VECTORSTORE, PUEDEN SER MULTIPLES
 @app.post("/upload")
 async def extract_text_from_pdf(files: List[UploadFile] = File(...)):
     # Ensure the uploaded file is a PDF
@@ -173,7 +189,7 @@ async def extract_text_from_pdf(files: List[UploadFile] = File(...)):
         finally:
                 await file.close()
                 
-    return {'message': 'Files processed successfully', 'results': results}
+    return {'message': 'Files processed successfully'}
     
 @app.get("/upload")
 async def show_files():
@@ -181,6 +197,7 @@ async def show_files():
 
 # SE GUARDAN LAS CONEXIONES en un diccionario
 ws_connections = {}
+# LOGICA DEL WEBSOCKET, SE ENTRA EN UN LOOP PARA RECIBIR MENSAJES DEL CLIENTE Y MANDAR LA RESPUESTA
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     # se crea un codigo unico por usuario, el cual es usado guardar el historial de chat 
@@ -204,17 +221,21 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             # print("Entering while loop")
             # SE RECIBE PREGUNTA
-            data = await websocket.receive_text()
-            logger.info("    %s",data)
             
-            # SE CREA RESPUESTA ASINCRONICA
-            
-            
-            respuesta= await respuesta_LLM(data,connection_id)
-            
-            
-            await websocket.send_text(respuesta)
-            logger.info("   %s",respuesta)
+                data = await websocket.receive_text()
+                logger.info("    %s",data)
+                
+                # SE CREA RESPUESTA ASINCRONICA
+                
+                
+                respuesta= await respuesta_LLM(data,connection_id)
+                
+                
+                await websocket.send_text(respuesta)
+                logger.info("   %s",respuesta)
+
+           
+
             # print(respuesta)
         
 
@@ -224,6 +245,8 @@ async def websocket_endpoint(websocket: WebSocket):
         # se elimina
         if connection_id in ws_connections:
             del ws_connections[connection_id]
+
+# MISMA LOGICA QUE EL OTRO WEBSOCKET PERO SE LLAMA A COMMAND_LLM EN VEZ DE RESPUESTA_LLM
 @app.websocket("/wsadmin")
 async def websocket_admin(websocket: WebSocket):
     try:
@@ -260,10 +283,10 @@ async def websocket_admin(websocket: WebSocket):
         # se elimina
         
      
-# si no se monta este directorio no carga el javascript ni el css
+# AQUI SE MONTA LA CARPETA "STATIC" EN EL ENDPOINT "/STATIC"
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-
+# SE ACEPTAN TODAS LAS CONEXIONES
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

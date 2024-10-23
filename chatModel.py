@@ -40,7 +40,10 @@ class modelo:
 
     embeddings=OpenAIEmbeddings(api_key=openai_key)
 
-    vectorstore = FAISS.load_local("vectorstorev2",embeddings,allow_dangerous_deserialization="true")
+    vectorstore = FAISS.load_local(
+         "vectorstorev2",
+         embeddings,
+         allow_dangerous_deserialization="true")
 
     retriever=vectorstore.as_retriever()
 

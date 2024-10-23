@@ -17,3 +17,4 @@ local.ipynb
 test.ipynb
 voztotext.html
 voice-to-text.ipynb
+*.ipynb

@@ -12,6 +12,7 @@
     <!-- Google Fonts Link For Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,1,0" />
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     
     <style>
       .dropdown-menu{
@@ -20,21 +21,27 @@
       .chatbot{
         display: none;
       }
-       .button-container{
-        bottom: 10%;
+      .dropdown-menu{
         
-        position: absolute;
-       }
-      .button-container img{
-        width: 40%;
+        top: 10%;
         height: 40%;
-        left: 30%;
-        top: 30px;
-        position: relative;
+        position: absolute;
+      }
+      .dropdown-menu header{
+        height: 65px;
+
+      }
+      .dropdown-menu img{
+        width: 50%;
+        
+        left: 25%;
+        top: 30%;
+        position: absolute;
         cursor: pointer;
         
       }
       .formita{
+        
         position: absolute;
         width: 30%;
         right: 35%;
@@ -45,35 +52,10 @@
   <body>
     
     <div id="dropdownMenu" class="dropdown-menu">
-      <header>
-        <h2> Preguntas frecuentes</h2>
-      </header>
-      <div class="faq-item">
-        <a class="faq-question" href="#">Pregunta 1
-          <span class="arrow"></span>
-        </a>
-        <div class="faq-answer">
-            <p>blablablbalbalbalbalbllalbalabl</p>
-        </div>
-    </div>
-    <div class="faq-item">
-        <a class="faq-question" href="#">Pregunta 2
-          <span class="arrow"></span>
-        </a>
-        <div class="faq-answer">
-            <p>blablalbablblalbalab</p>
-        </div>
-    </div>
-    <div class="faq-item">
-        <a class="faq-question" href="#">Pregunta 3
-          <span class="arrow"></span>
-        </a>
-        <div class="faq-answer">
-            <p>blbalbalbalballablballbla</p>
-        </div>
-
-      <div class="button-container">
-        <header>Comandos por voz</header>
+      
+        <header>
+          <h2>Comandos por voz</h2>
+        </header>
       
         <img id="micButton" src="static/microphone.png" alt="" >
         
@@ -123,12 +105,22 @@
 
       micButton.addEventListener('mousedown',startRecording)
       micButton.addEventListener('mouseup',stopRecording)
-      
+      // document.addEventListener('keydown', (e) => {
+      //   if (e.key === 'r') {
+      //     startRecording()
+      //   }
+      // })
+      // document.addEventListener('keyup', (e) => {
+      //   if (e.key === 'r') {
+      //     stopRecording()
+      //   }
+      // })
       function checkPass(event) {
             event.preventDefault(); // Prevent form submission
             const password = document.getElementById("pass").value;
+            const hashedPass = CryptoJS.SHA256(password);
             
-            if (password === "citilabs") {
+            if (hashedPass.toString(CryptoJS.enc.Hex) === "eac057a40a954b894d53b1379733e442d3e31cc0ebad27dd5d2d8dbe404089e8") {
                 dropMenu.style.display = "block";
                 chatBot.style.display = "block";
                 document.getElementById("formita").style.display="none";
@@ -174,7 +166,7 @@
 
   </script>
   <script>
-    var socket = new WebSocket("ws://192.168.31.239:12500/wsadmin"); 
+    var socket = new WebSocket("ws://192.168.1.5:12500/wsadmin"); 
               // cambiar IP a la del pc grande
             var respuesta,messageHolder;
             
@@ -300,7 +292,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const dropdownMenu = document.getElementById('dropdownMenu');
     const container = document.getElementById('mainContainer');
     let TOGGLING= false;
-    
+       container.classList.toggle('move-left');
+        dropdownMenu.classList.toggle('appear');
   
     // Agregar un event listener para el clic en el icono del menú
     menuIcon.addEventListener('click', function() {

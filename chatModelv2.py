@@ -26,21 +26,23 @@ import asyncio
 
 
 class fetchMapInput(BaseModel):
-    mapa : str = Field(description="Tipo de mapa que se quiere pedir")
+    mapa : str = Field(description="El nombre del mapa que esta pidiendo el usuario")
 
 class InputPlacas(BaseModel):
-    placa : str = Field(description="Placa que se quiere cambiar, debe ser un numero")
+    placa : str = Field(description="Placa que se quiere cambiar")
 
 class FetchMapTool(BaseTool):
-    name = "Mapas"
-    description = "Necesaria para desplegar mapas de Citylab"
+    name = "Cambio_de_mapas"
+    description = "Debes usar esta herramienta si te pidan cambiar o ver un mapa."
     args_schema: Type[BaseModel] = fetchMapInput
     return_direct: bool = True
+    # handle_tool_error: bool = "Lo siento, ¿Puedes preguntar eso denuevo?"
 
     def _run(
         self, mapa: str, run_manager: Optional[CallbackManagerForToolRun] = None
-    ) -> str:
+    ) -> None:
         """Usa la herramienta"""
+        print("usando herramienta:",self.name)
         mapa_min = mapa.lower()
 
         url_get= "http://192.168.31.120:8500//api/set_map_type/"
@@ -65,7 +67,7 @@ class FetchMapTool(BaseTool):
             requests.get(url=url_get)
         finally:
 
-            return url_get
+            return
 
     async def _arun(
         self,
@@ -83,8 +85,8 @@ class FetchMapTool(BaseTool):
 
     
 class CambiarPlaca(BaseTool):
-    name = "Placas"
-    description = "Cambio de placas en mapas Citylab"
+    name = "Cambio_de_placas"
+    description = "Debes usar esta herramienta si te piden cambiar una placa"
     args_schema: Type[BaseModel] = InputPlacas
     return_direct: bool = True
 
@@ -92,6 +94,7 @@ class CambiarPlaca(BaseTool):
     def _run(
         self, placa: str, run_manager: Optional[CallbackManagerForToolRun] = None
     ) -> str:
+        print("usando herramienta:",self.name)
         url_get= "http://192.168.31.120:8500/api/set_map_state/"
         try:
             placa_int = int(placa)
