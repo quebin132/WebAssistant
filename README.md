@@ -57,3 +57,11 @@ Si se quieren agregar herramientas, tienen que seguir la misma forma de las que 
 Se debe crear una clase que represente los argumentos que recibirá la herramienta y después usar esta clase en el args_schema de la herramienta, siguiendo esta estructura: [tooling](https://python.langchain.com/v0.1/docs/modules/tools/custom_tools/) en el apartado Subclass BaseTool.
 
 Una vez se haya creado una nueva herramienta, se debe crear una instancia de la clase en el _**init**_ de la clase _modelov2_ de la misma forma que ya está hecha para las herramientas existentes y después se deben añadir a la lista de herramientas que está más abajo. De este modo, el modelo debería tener acceso a las nuevas herramientas.
+
+## Docker
+
+> [!TIP]
+> docker compose up --build
+
+El contenedor tiene toda esta carpeta como volumen, por lo que cualquier cambio se deberia ver reflejado en Docker. Si cambian algo de los requisitos tienen que botar el contenedor y levantarlo denuevo.
+
